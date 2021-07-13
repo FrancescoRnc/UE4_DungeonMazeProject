@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "Interactable.generated.h"
 
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UInteractable : public UInterface
@@ -25,4 +26,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void GetInteraction(AActor* other);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void Interact();
 };

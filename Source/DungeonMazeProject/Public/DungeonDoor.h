@@ -8,6 +8,7 @@
 #include "Interactable.h"
 #include "Kismet/GameplayStatics.h"
 
+
 #include "DungeonDoor.generated.h"
 
 UCLASS()
@@ -20,7 +21,7 @@ public:
 	// Sets default values for this actor's properties
 	ADungeonDoor();
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, VisibleInstanceOnly)
 	FName CurrentLevelName;
 	
 	UPROPERTY(BlueprintReadWrite, EditInstanceOnly)
@@ -28,12 +29,12 @@ public:
 
 protected:
 	// Called when the game starts or when spawned
-	//virtual void BeginPlay() override;
+	virtual void BeginPlay() override;
 
 public:	
 	// Called every frame
 	//virtual void Tick(float DeltaTime) override;
 
 	virtual void GetInteraction_Implementation(AActor* other) override;
-
+	virtual void Interact_Implementation() override;
 };
