@@ -5,30 +5,18 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 
-#include "InteractableObject.h"
-#include "Kismet/GameplayStatics.h"
+#include "Interactable.h"
 
-
-#include "DungeonDoor.generated.h"
+#include "DungeonCrate.generated.h"
 
 UCLASS()
-class DUNGEONMAZEPROJECT_API ADungeonDoor : public AActor, public IInteractable
+class DUNGEONMAZEPROJECT_API ADungeonCrate : public AActor, public IInteractable
 {
-
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ADungeonDoor();
-
-	UPROPERTY(BlueprintReadOnly, VisibleInstanceOnly)
-	FName CurrentLevelName;
-	
-	UPROPERTY(BlueprintReadWrite, EditInstanceOnly)
-	FName NextLevelName;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FInteractableData Data;
+	ADungeonCrate();
 
 protected:
 	// Called when the game starts or when spawned

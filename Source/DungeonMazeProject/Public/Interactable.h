@@ -7,6 +7,8 @@
 #include "Interactable.generated.h"
 
 
+DECLARE_DYNAMIC_DELEGATE(FInteractionDelegate);
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UInteractable : public UInterface
@@ -23,9 +25,6 @@ class DUNGEONMAZEPROJECT_API IInteractable
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void GetInteraction(AActor* other);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void Interact();

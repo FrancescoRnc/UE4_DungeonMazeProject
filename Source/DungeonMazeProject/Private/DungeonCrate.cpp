@@ -1,33 +1,35 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "DungeonDoor.h"
+#include "DungeonCrate.h"
 
 // Sets default values
-ADungeonDoor::ADungeonDoor()
+ADungeonCrate::ADungeonCrate()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-		
+
 }
 
 // Called when the game starts or when spawned
-void ADungeonDoor::BeginPlay()
+void ADungeonCrate::BeginPlay()
 {
 	Super::BeginPlay();
-
-	CurrentLevelName = FName(UGameplayStatics::GetCurrentLevelName(GetWorld()));
+	
 }
 
 // Called every frame
-//void ADungeonDoor::Tick(float DeltaTime)
+//void ADungeonCrate::Tick(float DeltaTime)
 //{
 //	Super::Tick(DeltaTime);
 //
 //}
 
 
-void ADungeonDoor::Interact_Implementation()
+void ADungeonCrate::Interact_Implementation()
 {
-	UGameplayStatics::OpenLevel(GetWorld(), NextLevelName);
+	UE_LOG(LogTemp, Warning, TEXT("YOU OPENED A TREASURE CHEST !!!"));
 }
+
+
+

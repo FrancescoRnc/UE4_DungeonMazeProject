@@ -14,33 +14,22 @@ class DUNGEONMAZEPROJECT_API InputActionData
 	public:
 	InputActionData();
 	InputActionData(int32 index, FName _name)
-		: Index(index), Name(_name) {}
+		: Index(index), Name(_name) {DelegateStack.Push({});}
 	InputActionData(int32 index, FName _name, FInputActionHandlerSignature _delegate)
-		: Index(index), Name(_name), Delegate(_delegate) {}
+		: Index(index), Name(_name), DelegateStack({_delegate}) {}
 
+	void Push(FInputActionHandlerSignature newDelegate) { DelegateStack.Push(newDelegate); }
+	FInputActionHandlerSignature& Peek() { return DelegateStack.Last(); }
+	FInputActionHandlerSignature Pop() { auto pop = DelegateStack.Pop(false); return pop; }
+	
 	int32 Index = -1;
 	FName Name = "None";	
-	FInputActionHandlerSignature Delegate;
-};
-
-// INPUT ACTION SET
-class DUNGEONMAZEPROJECT_API InputActionSet
-{
-	public:
-	InputActionSet() : Actions({}) {}
-	InputActionSet(TArray<InputActionData> _actions) : Actions(_actions) {}
-
-	void Add(InputActionData newData) { Actions.Add(newData); }
-	InputActionData& GetActionData(int32 index) { return Actions[index]; }
-	void SetDelegateToAction(int32 index);
-
-	private:
-	TArray<InputActionData> Actions;
+	TArray<FInputActionHandlerSignature> DelegateStack;
 };
 
 
  //////////////////////////////
-// INPUT HANDLE //////////////
+/// INPUT HANDLE /////////////-
 class DUNGEONMAZEPROJECT_API InputHandle
 {
 	public:
@@ -52,6 +41,7 @@ class DUNGEONMAZEPROJECT_API InputHandle
 	void SetDelegateToData(int32 index, FInputActionHandlerSignature signature);
 	void SetDelegateToAction(int32 index);
 	InputActionData& GetActionData(int32 index) { return ActionsData[index]; }
+	FInputActionHandlerSignature& GetActionDelegate(int32 index) { return ActionsData[index].DelegateStack.Last(); }
 	void AddData(InputActionData data);
 
 	private:

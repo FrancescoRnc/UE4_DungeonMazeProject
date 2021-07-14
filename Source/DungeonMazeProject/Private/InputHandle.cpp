@@ -19,12 +19,14 @@ void InputHandle::RegisterNewAction(FName _actionName, EInputEvent _eventType)
 
 void InputHandle::SetDelegateToData(int32 index, FInputActionHandlerSignature signature)
 {
-	ActionsData[index].Delegate = signature;	
+	ActionsData[index].Push(signature);	
 }
 
 void InputHandle::SetDelegateToAction(int32 index)
 {	
-	refInputComponent->GetActionBinding(index).ActionDelegate = ActionsData[index].Delegate;
+	refInputComponent->GetActionBinding(index).ActionDelegate = ActionsData[index].Peek();
+
+	FInputActionUnifiedDelegate unified;
 }
 
 void InputHandle::AddData(InputActionData data)

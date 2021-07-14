@@ -14,7 +14,7 @@
 #include "DungeonCharacter.generated.h"
 
 
-DECLARE_DYNAMIC_DELEGATE(FInteractionDelegate);
+//DECLARE_DYNAMIC_DELEGATE(FInteractionDelegate);
 
 
 UCLASS()
@@ -27,11 +27,12 @@ public:
 	// Sets default values for this character's properties
 	ADungeonCharacter();
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	USphereComponent* InteractionCollider;
 
-	UPROPERTY()
-	FInteractionDelegate CurrentInteraction;
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
+	APlayerCameraManager* CameraManager;
+
 
 	
 protected:
@@ -52,8 +53,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Interact();
 	UFUNCTION(BlueprintCallable)
-	void NewInteract();
-	UFUNCTION(BlueprintCallable)
 	void Attack();
 
 	UFUNCTION(BlueprintCallable)
@@ -71,7 +70,7 @@ public:
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 
-	UFUNCTION()
-	void SetInteractionDelegate(FInteractionDelegate delegate);
+	//UFUNCTION()
+	//void SetInteractionDelegate(FInteractionDelegate delegate);
 
 };

@@ -3,6 +3,8 @@
 
 #include "DungeonCharacter.h"
 
+#include "Interactable.h"
+
 // Sets default values
 ADungeonCharacter::ADungeonCharacter()
 {
@@ -17,14 +19,12 @@ ADungeonCharacter::ADungeonCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
 
 	InteractionCollider = CreateDefaultSubobject<USphereComponent>("Interaction Collider");
-	InteractionCollider->InitSphereRadius(100.f);
+	InteractionCollider->InitSphereRadius(150.f);
 	InteractionCollider->SetCollisionProfileName(TEXT("Interaction"));
 	InteractionCollider->SetupAttachment(RootComponent);
 	InteractionCollider->SetGenerateOverlapEvents(true);
 	InteractionCollider->OnComponentBeginOverlap.AddDynamic(this, &ADungeonCharacter::OnInteractionBeginOverlap);
     InteractionCollider->OnComponentEndOverlap.AddDynamic(this, &ADungeonCharacter::OnInteractionEndOverlap);
-
-
 	
 }
 
@@ -33,7 +33,9 @@ void ADungeonCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+	if (GEngine) CameraManager = GEngine->GetFirstLocalPlayerController(GetWorld())->PlayerCameraManager;
+	FLinearColor black{0.0f, 0.0f, 0.0f, 0.0f};
+	CameraManager->StartCameraFade(1, 0, 3, black, false, true);
 }
 
 // Called every frame 
@@ -51,8 +53,8 @@ void ADungeonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputHandle = (PlayerInputComponent);
 	PlayerInputHandle.RegisterNewAction("Interaction", EInputEvent::IE_Pressed);
 	PlayerInputHandle.RegisterNewAction("Attack", EInputEvent::IE_Pressed);
-	PlayerInputHandle.GetActionData(0).Delegate.BindUObject(this, &ADungeonCharacter::Interact);
-	PlayerInputHandle.GetActionData(1).Delegate.BindUObject(this, &ADungeonCharacter::Attack);
+	PlayerInputHandle.GetActionDelegate(0).BindUObject(this, &ADungeonCharacter::Interact);
+	PlayerInputHandle.GetActionDelegate(1).BindUObject(this, &ADungeonCharacter::Attack);
 	PlayerInputHandle.SetDelegateToAction(0);
 	PlayerInputHandle.SetDelegateToAction(1);
 	
@@ -66,6 +68,8 @@ void ADungeonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	//FInputActionHandlerSignature signature; signature.BindUObject(this, &ADungeonCharacter::Interact);
 	//PlayerInputHandle.SetDelegateToData(0, signature);
 	//PlayerInputHandle.AddData({1, "Attack"});
+
+	
 }
 
 
@@ -73,10 +77,6 @@ void ADungeonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 void ADungeonCharacter::Interact()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Interaction"));
-}
-void ADungeonCharacter::NewInteract()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Interaction but with a new function!!!"));
 }
 
 void ADungeonCharacter::Attack()
@@ -88,10 +88,16 @@ void ADungeonCharacter::MoveForward(float _value)
 {	
 	if (Controller && _value != 0.0f)
 	{
-		const FRotator _rotation = Controller->GetControlRotation();
-		const FRotator _yawRot(0.f, _rotation.Yaw, 0.f);
+		//const FRotator _rotation = Controller->GetControlRotation();
+		//const FRotator _yawRot(0.f, _rotation.Yaw, 0.f);
+		//const FVector _direction = FRotationMatrix(_yawRot).GetUnitAxis(EAxis::X);
+		
+		const FRotator _cameraDir = CameraManager->GetCameraRotation();
+		const FRotator _yawRot(0.f, _cameraDir.Yaw, 0.f);
 		const FVector _direction = FRotationMatrix(_yawRot).GetUnitAxis(EAxis::X);
-
+		
+		//UE_LOG(LogTemp, Warning, TEXT("Forward: %f"), _direction.X);
+		
 		AddMovementInput(_direction, _value);
 	}
 }
@@ -100,34 +106,51 @@ void ADungeonCharacter::MoveRight(float _value)
 {	
 	if (Controller && _value != 0.0f)
 	{
-		const FRotator _rotation = Controller->GetControlRotation();
-		const FRotator _yawRot(0.f, _rotation.Yaw, 0.f);
+		//const FRotator _rotation = Controller->GetControlRotation();
+		//const FRotator _yawRot(0.f, _rotation.Yaw, 0.f);
+		//const FVector _direction = FRotationMatrix(_yawRot).GetUnitAxis(EAxis::Y);
+
+		const FRotator _cameraDir = CameraManager->GetCameraRotation();
+		const FRotator _yawRot(0.f, _cameraDir.Yaw, 0.f);
 		const FVector _direction = FRotationMatrix(_yawRot).GetUnitAxis(EAxis::Y);
+		
+		//UE_LOG(LogTemp, Warning, TEXT("Right  : %f"), _direction.Y);
 
 		AddMovementInput(_direction, _value);
 	}
 }
 
+
+
 void ADungeonCharacter::OnInteractionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Something has entered Collision!"));
-	PlayerInputHandle.GetActionData(0).Delegate.BindUObject(this, &ADungeonCharacter::NewInteract);
-	PlayerInputHandle.SetDelegateToAction(0);
+	IInteractable* interactable = Cast<IInteractable>(OtherActor);
+	if (interactable)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Something has entered Collision!"));
+        FInputActionHandlerSignature signature; signature.BindRaw(interactable, &IInteractable::Interact_Implementation);
+        PlayerInputHandle.GetActionData(0).Push(signature);
+        PlayerInputHandle.SetDelegateToAction(0);
+	}
+	
 }
 
 void ADungeonCharacter::OnInteractionEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Something has exited Collision!"));
-	PlayerInputHandle.GetActionData(0).Delegate.BindUObject(this, &ADungeonCharacter::Interact);
+	//PlayerInputHandle.GetActionDelegate(0).BindUObject(this, &ADungeonCharacter::Interact);
+	PlayerInputHandle.GetActionData(0).Pop();
 	PlayerInputHandle.SetDelegateToAction(0);
 }
 
-void ADungeonCharacter::SetInteractionDelegate(FInteractionDelegate _delegate)
-{
-	FInputActionHandlerSignature newSignature;
-	newSignature.BindUFunction(_delegate.GetUObject(), _delegate.GetFunctionName());
-	InputComponent->GetActionBinding(0).ActionDelegate = newSignature;
-}
+
+
+//void ADungeonCharacter::SetInteractionDelegate(FInteractionDelegate _delegate)
+//{
+//	FInputActionHandlerSignature newSignature;
+//	newSignature.BindUFunction(_delegate.GetUObject(), _delegate.GetFunctionName());
+//	InputComponent->GetActionBinding(0).ActionDelegate = newSignature;
+//}
 
