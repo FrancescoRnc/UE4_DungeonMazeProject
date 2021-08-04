@@ -70,7 +70,5 @@ public:
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 
-	//UFUNCTION()
-	//void SetInteractionDelegate(FInteractionDelegate delegate);
-
+	
 };

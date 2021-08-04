@@ -10,14 +10,24 @@ AInteractableObject::AInteractableObject()
 	PrimaryActorTick.bCanEverTick = false;
 
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	StaticMesh->SetupAttachment(RootComponent);
-	if (ObjectData.StaticMesh) StaticMesh->SetStaticMesh(ObjectData.StaticMesh);
-
 	BoxInteractionCollider = CreateDefaultSubobject<UBoxComponent>("Interaction Collider");
-	BoxInteractionCollider->SetupAttachment(RootComponent);
-	BoxInteractionCollider->SetBoxExtent(ObjectData.ColliderSize);
-	BoxInteractionCollider->SetCollisionProfileName("Interaction");
 
+	if (RootComponent)
+	{
+		BoxInteractionCollider->SetupAttachment(RootComponent);
+      	StaticMesh->SetupAttachment(RootComponent);
+	}
+	
+	
+	if (!ObjectInfo) return;	
+	if (ObjectInfo->StaticMesh) StaticMesh->SetStaticMesh(ObjectInfo->StaticMesh);        
+        
+    
+    BoxInteractionCollider->SetBoxExtent(ObjectInfo->ColliderSize);
+    BoxInteractionCollider->SetCollisionProfileName("Interaction");
+	
+	
+	//ObjectInfo->Delegate.BindUFunction(this, "Interact_Implementation");
 }
 
 // Called when the game starts or when spawned
@@ -38,4 +48,5 @@ void AInteractableObject::Interact_Implementation()
 {
 	
 }
+
 

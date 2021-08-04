@@ -4,6 +4,7 @@
 #include "DungeonCharacter.h"
 
 #include "Interactable.h"
+#include "InteractableObject.h"
 
 // Sets default values
 ADungeonCharacter::ADungeonCharacter()
@@ -136,6 +137,7 @@ void ADungeonCharacter::OnInteractionBeginOverlap(UPrimitiveComponent* Overlappe
 	
 }
 
+
 void ADungeonCharacter::OnInteractionEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
@@ -146,11 +148,4 @@ void ADungeonCharacter::OnInteractionEndOverlap(UPrimitiveComponent* OverlappedC
 }
 
 
-
-//void ADungeonCharacter::SetInteractionDelegate(FInteractionDelegate _delegate)
-//{
-//	FInputActionHandlerSignature newSignature;
-//	newSignature.BindUFunction(_delegate.GetUObject(), _delegate.GetFunctionName());
-//	InputComponent->GetActionBinding(0).ActionDelegate = newSignature;
-//}
 

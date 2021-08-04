@@ -27,8 +27,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditInstanceOnly)
 	FName NextLevelName;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FInteractableData Data;
+	//UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	//UInteractableData Data;
 
 protected:
 	// Called when the game starts or when spawned
