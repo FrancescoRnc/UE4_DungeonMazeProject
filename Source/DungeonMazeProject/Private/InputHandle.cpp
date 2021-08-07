@@ -8,7 +8,7 @@ InputHandle::~InputHandle()
 	ActionsData.Empty();
 }
 
-void InputHandle::RegisterNewAction(FName _actionName, EInputEvent _eventType)
+void InputHandle::RegisterNewAction(const FName& _actionName, const EInputEvent _eventType)
 {
 	FInputActionBinding newBinding = {_actionName, _eventType};
 	refInputComponent->AddActionBinding(newBinding);
@@ -17,19 +17,19 @@ void InputHandle::RegisterNewAction(FName _actionName, EInputEvent _eventType)
 	AddData({indexOfLast, _actionName});
 }
 
-void InputHandle::SetDelegateToData(int32 index, FInputActionHandlerSignature signature)
+void InputHandle::SetDelegateToData(const int32 index, const FInputActionHandlerSignature& signature)
 {
 	ActionsData[index].Push(signature);	
 }
 
-void InputHandle::SetDelegateToAction(int32 index)
+void InputHandle::SetDelegateToAction(const int32 index)
 {	
 	refInputComponent->GetActionBinding(index).ActionDelegate = ActionsData[index].Peek();
 
 	FInputActionUnifiedDelegate unified;
 }
 
-void InputHandle::AddData(InputActionData data)
+void InputHandle::AddData(const InputActionData& data)
 {
 	ActionsData.Add(data);
 }

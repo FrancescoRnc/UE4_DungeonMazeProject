@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 
+
 #include "DungeonBuilder.h"
 #include "DungeonDoor.h"
 #include "DungeonCrate.h"
@@ -13,8 +14,7 @@
 
 #include "DungeonMaze.generated.h"
 
-UENUM(BlueprintType)
-enum class RoomCardinals : uint8 { NORTH = 0, WEST = 1, EAST = 2, SOUTH = 3 };
+
 
 
 // Level Room Content Info Data Asset
@@ -26,52 +26,38 @@ class DUNGEONMAZEPROJECT_API ULevelRoomContentInfo : public UDataAsset
 	public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FName LevelName;
+	FName LevelTypeName;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UStaticMesh* EnvironmentMesh;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UInteractableData* NorthDoor;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UInteractableData* SouthDoor;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UInteractableData* EastDoor;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UInteractableData* WestDoor;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<UInteractableData*> Crates;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	bool RandomizeEnemies;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<UInteractableData*> Enemies; // PROVVISORIO DO NOT USE
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<UInteractableData*> OtherInteractables;
 };
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 
 // Structs
+
+
 USTRUCT(BlueprintType)
 struct DUNGEONMAZEPROJECT_API FRoomInfo
 {
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FName Name;
+	FName Name = L"None";
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FIntVector GridCoords;
+	ULevelRoomContentInfo* RoomAsset;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TMap<RoomCardinals, FName> Doors;
+	FIntVector GridCoords = {0, 0, 0};
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FVector2D RoomSize = {4000.f, 4000.f};
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	//TMap<ERoomCardinals, FName> Doors;
+	TArray<FDoorInfo> Doors;
 	
 };
 
@@ -115,6 +101,8 @@ struct DUNGEONMAZEPROJECT_API FNewLevelInstanceParams
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 
+class ARoom;
+
 // Room Generator 
 UCLASS()
 class DUNGEONMAZEPROJECT_API URoomGenerator : public UObject
@@ -130,23 +118,14 @@ class DUNGEONMAZEPROJECT_API URoomGenerator : public UObject
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UStaticMesh* EnvironmentMesh;
+
+	UFUNCTION(BlueprintCallable)
+	void GenerateRoom(ARoom* inRoom, const FRoomInfo& _info);
 	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	ADungeonDoor* NorthDoor;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	ADungeonDoor* SouthDoor;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	ADungeonDoor* EastDoor;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	ADungeonDoor* WestDoor;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<ADungeonCrate*> Crates;
-
 	UFUNCTION(BlueprintCallable)
 	void SetEnvironment(UStaticMeshComponent* inComponent);
 	UFUNCTION(BlueprintCallable)
-	void BuildDoors(TArray<ADungeonDoor*> inDoors);
+	void GenerateDoors(const FRoomInfo& inInfo, TArray<ADungeonDoor*>& inDoors, UStaticMesh* mesh);
 	UFUNCTION(BlueprintCallable)
 	void BuildOtherActors();	
 };
@@ -163,8 +142,8 @@ class DUNGEONMAZEPROJECT_API ARoom : public AActor
 
 	ARoom();
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Edit")
-	ULevelRoomContentInfo* RoomAsset;
+	//UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Edit")
+	//ULevelRoomContentInfo* RoomAsset;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	URoomGenerator* RoomGenerator;
@@ -184,6 +163,14 @@ class DUNGEONMAZEPROJECT_API ARoom : public AActor
 	protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	public:
+	
+	UFUNCTION(BlueprintCallable)
+	void GenerateRoom(const FRoomInfo& _info);
+	
+	UFUNCTION(BlueprintCallable)
+	void GenerateDoors();
 };
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -198,24 +185,35 @@ class DUNGEONMAZEPROJECT_API UCampainDungeonBuilder : public UObject, public IDu
 	
 	UCampainDungeonBuilder();	
 
-	virtual void BuildDungeon_Implementation(int sizeX, int sizeY) override;
-	virtual void BuildRoom_Implementation(FIntVector coords) override;
-	virtual void BuildDoor_Implementation(FName roomFrom, FName roomTo) override;
+	virtual void BuildDungeon_Implementation(const int sizeX, const int sizeY) override;
+	//virtual void BuildRoom_Implementation(const FIntVector coords) override;
+	virtual void BuildRooms_Implementation(ULevelRoomContentInfo* _asset, const TArray<FIntVector>& coords) override;
+	//virtual void BuildDoor_Implementation(const FName& roomFrom, const FName& roomTo) override;
+	virtual void BuildDoors_Implementation(UInteractableData* _asset, const TArray<int>& inGrid) override;
 
 	UFUNCTION(BlueprintCallable)
 	FDungeonInfo& GetDungeon();
 
 	UFUNCTION(BlueprintCallable)
-	TArray<int> GetGridValues(int width, int height);
+	TArray<int> GetGridValues(const int width, const int height);
 
 	UFUNCTION(BlueprintCallable)
-	TArray<FIntVector> GetRoomsCoordsByValues(TArray<int> inValues);
+	TArray<FIntVector> GetRoomsCoordsByValues(const TArray<int>& inValues);
+
+	UFUNCTION(BlueprintCallable)
+	const FRoomInfo GetRoomByGridIndex(const TArray<FRoomInfo>& rooms, const int gridindex) const;
+
+	UFUNCTION(BlueprintCallable)
+	const FRoomInfo GetRoomByCoords(const TArray<FRoomInfo>& rooms, const int x, const int y) const;
+
+	void BuildDoorsForRoom(const TArray<int>& inGrid, const int roomIndex);
 	
 	private:
 	
 	UPROPERTY()
 	FDungeonInfo outDungeon;
 };
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 
@@ -229,14 +227,17 @@ public:
 	// Sets default values for this actor's properties
 	ADungeonMaze();
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Debug")
-	int dLevelIndex;
+	//UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Debug")
+	//int dLevelIndex;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Edit")
 	int GridWidth;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Edit")
 	int GridHeight;
+
+	//UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Edit")
+	//ULevelRoomContentInfo* RoomAsset;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Edit")
 	FString FirstRoomLevelName;
@@ -246,12 +247,18 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Edit")
 	FString LastRoomLevelName;
-	
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	TArray<ULevelStreamingDynamic*> RoomInstances;
+	TArray<ARoom*> refRooms;
+	
+	//UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	//TArray<ULevelStreamingDynamic*> RoomInstances;
 	
 	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
     UCampainDungeonBuilder* Builder;
+
+	//UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Edit")
+	//ULevelRoomContentInfo* RoomAsset;
 
 protected:
 	// Called when the game starts or when spawned
@@ -263,13 +270,13 @@ public:
 	void SwitchRooms(FName newRoom);
 	
 	UFUNCTION(BlueprintCallable)
-	void CreateDungeonInfo(UCampainDungeonBuilder* _builder);
+	void CreateDungeonInfo();
 
 	UFUNCTION(BlueprintCallable)
-	void GenerateDungeonFromInfo(FDungeonInfo dungeoninfo);
+	void GenerateDungeonFromInfo(const FDungeonInfo& dungeoninfo);
 
-	UFUNCTION(BlueprintCallable)
-	void SetLevelVisibility(int index, bool value);
+	//UFUNCTION(BlueprintCallable)
+	//void SetLevelVisibility(const int index, const bool value);
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	FDungeonInfo info;	

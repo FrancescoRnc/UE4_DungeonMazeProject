@@ -9,6 +9,7 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "InputHandle.h"
 
 #include "DungeonCharacter.generated.h"
@@ -27,8 +28,11 @@ public:
 	// Sets default values for this character's properties
 	ADungeonCharacter();
 
+	//UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	//USphereComponent* InteractionCollider;
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	USphereComponent* InteractionCollider;
+	UCapsuleComponent* InteractionCapsule;
 
 	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
 	APlayerCameraManager* CameraManager;
@@ -56,9 +60,9 @@ public:
 	void Attack();
 
 	UFUNCTION(BlueprintCallable)
-	void MoveForward(float _value);
+	void MoveForward(const float _value);
 	UFUNCTION(BlueprintCallable)
-	void MoveRight(float _value);
+	void MoveRight(const float _value);
 
 
 	UFUNCTION()
@@ -69,6 +73,9 @@ public:
 	void OnInteractionEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	UFUNCTION(BlueprintCallable)
+	void ActivateCharacter();
 
-	
+	UFUNCTION(BlueprintCallable)
+	void DeactivateCharacter();
 };

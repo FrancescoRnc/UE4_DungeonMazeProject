@@ -37,12 +37,12 @@ class DUNGEONMAZEPROJECT_API InputHandle
 	InputHandle(UInputComponent* refComponent) : refInputComponent(refComponent), ActionsData({}) {}	
 	~InputHandle();
 
-	void RegisterNewAction(FName _actionName, EInputEvent _eventType);
-	void SetDelegateToData(int32 index, FInputActionHandlerSignature signature);
-	void SetDelegateToAction(int32 index);
-	InputActionData& GetActionData(int32 index) { return ActionsData[index]; }
-	FInputActionHandlerSignature& GetActionDelegate(int32 index) { return ActionsData[index].DelegateStack.Last(); }
-	void AddData(InputActionData data);
+	void RegisterNewAction(const FName& _actionName, const EInputEvent _eventType);
+	void SetDelegateToData(const int32 index, const FInputActionHandlerSignature& signature);
+	void SetDelegateToAction(const int32 index);
+	InputActionData& GetActionData(const int32 index) { return ActionsData[index]; }
+	FInputActionHandlerSignature& GetActionDelegate(const int32 index) { return ActionsData[index].DelegateStack.Last(); }
+	void AddData(const InputActionData& data);
 
 	private:
 	UInputComponent* refInputComponent = 0;

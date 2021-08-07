@@ -18,14 +18,25 @@ ADungeonCharacter::ADungeonCharacter()
 			
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
+	//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+	
 
-	InteractionCollider = CreateDefaultSubobject<USphereComponent>("Interaction Collider");
-	InteractionCollider->InitSphereRadius(150.f);
-	InteractionCollider->SetCollisionProfileName(TEXT("Interaction"));
-	InteractionCollider->SetupAttachment(RootComponent);
-	InteractionCollider->SetGenerateOverlapEvents(true);
-	InteractionCollider->OnComponentBeginOverlap.AddDynamic(this, &ADungeonCharacter::OnInteractionBeginOverlap);
-    InteractionCollider->OnComponentEndOverlap.AddDynamic(this, &ADungeonCharacter::OnInteractionEndOverlap);
+	//InteractionCollider = CreateDefaultSubobject<USphereComponent>("Interaction Collider");
+	//InteractionCollider->InitSphereRadius(150.f);
+	//InteractionCollider->SetCollisionProfileName(TEXT("Interaction"));
+	//InteractionCollider->SetupAttachment(RootComponent);
+	//InteractionCollider->SetGenerateOverlapEvents(true);
+	//InteractionCollider->OnComponentBeginOverlap.AddDynamic(this, &ADungeonCharacter::OnInteractionBeginOverlap);
+    //InteractionCollider->OnComponentEndOverlap.AddDynamic(this, &ADungeonCharacter::OnInteractionEndOverlap);
+
+	InteractionCapsule = CreateDefaultSubobject<UCapsuleComponent>("Interaction Capsule Collider");
+	InteractionCapsule->InitCapsuleSize(35, 100);
+	InteractionCapsule->AddRelativeLocation({75, 0, 0});
+	InteractionCapsule->SetCollisionProfileName(TEXT("Interaction"));
+	InteractionCapsule->SetupAttachment(RootComponent);
+	InteractionCapsule->SetGenerateOverlapEvents(true);
+	InteractionCapsule->OnComponentBeginOverlap.AddDynamic(this, &ADungeonCharacter::OnInteractionBeginOverlap);
+	InteractionCapsule->OnComponentEndOverlap.AddDynamic(this, &ADungeonCharacter::OnInteractionEndOverlap);
 	
 }
 
@@ -34,7 +45,9 @@ void ADungeonCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GEngine) CameraManager = GEngine->GetFirstLocalPlayerController(GetWorld())->PlayerCameraManager;
+	SetActorLocation({0,0,100});
+	
+	if (GEngine && !CameraManager) CameraManager = GEngine->GetFirstLocalPlayerController(GetWorld())->PlayerCameraManager;
 	FLinearColor black{0.0f, 0.0f, 0.0f, 0.0f};
 	CameraManager->StartCameraFade(1, 0, 3, black, false, true);
 }
@@ -85,7 +98,7 @@ void ADungeonCharacter::Attack()
 	UE_LOG(LogTemp, Warning, TEXT("Attack"));
 }
 
-void ADungeonCharacter::MoveForward(float _value)
+void ADungeonCharacter::MoveForward(const float _value)
 {	
 	if (Controller && _value != 0.0f)
 	{
@@ -103,7 +116,7 @@ void ADungeonCharacter::MoveForward(float _value)
 	}
 }
 
-void ADungeonCharacter::MoveRight(float _value)
+void ADungeonCharacter::MoveRight(const float _value)
 {	
 	if (Controller && _value != 0.0f)
 	{
@@ -145,6 +158,18 @@ void ADungeonCharacter::OnInteractionEndOverlap(UPrimitiveComponent* OverlappedC
 	//PlayerInputHandle.GetActionDelegate(0).BindUObject(this, &ADungeonCharacter::Interact);
 	PlayerInputHandle.GetActionData(0).Pop();
 	PlayerInputHandle.SetDelegateToAction(0);
+}
+
+void ADungeonCharacter::ActivateCharacter()
+{
+	//EnableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
+}
+
+void ADungeonCharacter::DeactivateCharacter()
+{
+	//DisableInput(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
 }
 
 

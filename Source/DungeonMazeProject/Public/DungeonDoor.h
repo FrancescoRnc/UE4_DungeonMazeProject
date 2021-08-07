@@ -11,6 +11,31 @@
 
 #include "DungeonDoor.generated.h"
 
+
+UENUM(BlueprintType)
+enum class ERoomCardinals : uint8 { NORTH = 0, SOUTH = 1, EAST = 2, WEST = 3  };
+
+
+USTRUCT(BlueprintType)
+struct DUNGEONMAZEPROJECT_API FDoorInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UInteractableData* DoorAsset;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	ERoomCardinals Direction;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FName RoomOriginName;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FName RoomDestinationName;
+	
+};
+
+
 UCLASS()
 class DUNGEONMAZEPROJECT_API ADungeonDoor : public AActor, public IInteractable
 {
@@ -20,6 +45,18 @@ class DUNGEONMAZEPROJECT_API ADungeonDoor : public AActor, public IInteractable
 public:	
 	// Sets default values for this actor's properties
 	ADungeonDoor();
+
+	//UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	//UInteractableData* DoorData;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	FDoorInfo Info;
+
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
+	UStaticMeshComponent* MeshComponent;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	UBoxComponent* BoxInteractionColision;
 
 	UPROPERTY(BlueprintReadOnly, VisibleInstanceOnly)
 	FName CurrentLevelName;
@@ -39,4 +76,7 @@ public:
 	//virtual void Tick(float DeltaTime) override;
 
 	virtual void Interact_Implementation() override;
+
+
+	void Initialize(const FDoorInfo& _info);
 };

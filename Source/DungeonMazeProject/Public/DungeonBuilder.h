@@ -9,6 +9,10 @@
 
 #include "DungeonBuilder.generated.h"
 
+
+class ULevelRoomContentInfo;
+class UInteractableData;
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UDungeonBuilder : public UInterface
@@ -27,9 +31,13 @@ class DUNGEONMAZEPROJECT_API IDungeonBuilder
 public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void BuildDungeon(int sizeX, int sizeY);
+	void BuildDungeon(const int sizeX, const int sizeY);
+	//UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	//void BuildRoom(const FIntVector coords);
+	//UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	//void BuildDoor(const FName& roomFrom, const FName& roomTo);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void BuildRoom(FIntVector coords);
+	void BuildRooms(ULevelRoomContentInfo* _asset, const TArray<FIntVector>& coords);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void BuildDoor(FName roomFrom, FName roomTo);
+	void BuildDoors(UInteractableData* _asset, const TArray<int>& inGrid);
 };
