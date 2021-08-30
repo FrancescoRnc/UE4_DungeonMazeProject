@@ -3,6 +3,7 @@
 
 #include "DungeonCharacter.h"
 
+#include "DungeonDoor.h"
 #include "Interactable.h"
 #include "InteractableObject.h"
 
@@ -11,33 +12,39 @@ ADungeonCharacter::ADungeonCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	
 	bUseControllerRotationPitch =
 		bUseControllerRotationYaw = 
 			bUseControllerRotationRoll = false;
 			
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
-	//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
 	
-
-	//InteractionCollider = CreateDefaultSubobject<USphereComponent>("Interaction Collider");
-	//InteractionCollider->InitSphereRadius(150.f);
-	//InteractionCollider->SetCollisionProfileName(TEXT("Interaction"));
-	//InteractionCollider->SetupAttachment(RootComponent);
-	//InteractionCollider->SetGenerateOverlapEvents(true);
-	//InteractionCollider->OnComponentBeginOverlap.AddDynamic(this, &ADungeonCharacter::OnInteractionBeginOverlap);
-    //InteractionCollider->OnComponentEndOverlap.AddDynamic(this, &ADungeonCharacter::OnInteractionEndOverlap);
-
+	// Set data to the Interaction Capsule Component, such as its size, profile name ecc.
 	InteractionCapsule = CreateDefaultSubobject<UCapsuleComponent>("Interaction Capsule Collider");
 	InteractionCapsule->InitCapsuleSize(35, 100);
-	InteractionCapsule->AddRelativeLocation({75, 0, 0});
+	InteractionCapsule->AddRelativeLocation({100, 0, 0});
 	InteractionCapsule->SetCollisionProfileName(TEXT("Interaction"));
-	InteractionCapsule->SetupAttachment(RootComponent);
+	InteractionCapsule->SetupAttachment(GetCapsuleComponent());
 	InteractionCapsule->SetGenerateOverlapEvents(true);
 	InteractionCapsule->OnComponentBeginOverlap.AddDynamic(this, &ADungeonCharacter::OnInteractionBeginOverlap);
 	InteractionCapsule->OnComponentEndOverlap.AddDynamic(this, &ADungeonCharacter::OnInteractionEndOverlap);
+	 
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>("Camera Arm");
+	SpringArm->SetupAttachment(RootComponent);
+	//SpringArm->SetRelativeRotation(FRotator(-45.f, -45.f, 0.f));
+	//SpringArm->TargetArmLength = 4000.f;
+	SpringArm->bEnableCameraLag = true;
+	SpringArm->CameraLagSpeed = 10.0f;
+	SpringArm->bInheritPitch =
+		SpringArm->bInheritRoll =
+			SpringArm->bInheritYaw = false;
+	SpringArm->bUsePawnControlRotation = false;
 	
+	Camera = CreateDefaultSubobject<UCameraComponent>("Camera Component");
+	Camera->SetupAttachment(SpringArm, SpringArm->SocketName);
+	
+	AutoPossessPlayer = EAutoReceiveInput::Player0;
 }
 
 // Called when the game starts or when spawned
@@ -65,10 +72,13 @@ void ADungeonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputHandle = (PlayerInputComponent);
+	// Registration of new Actions.
 	PlayerInputHandle.RegisterNewAction("Interaction", EInputEvent::IE_Pressed);
 	PlayerInputHandle.RegisterNewAction("Attack", EInputEvent::IE_Pressed);
+	// Binding a function to each Action's delegate.
 	PlayerInputHandle.GetActionDelegate(0).BindUObject(this, &ADungeonCharacter::Interact);
 	PlayerInputHandle.GetActionDelegate(1).BindUObject(this, &ADungeonCharacter::Attack);
+	// Set each Delegate to its proper Action.
 	PlayerInputHandle.SetDelegateToAction(0);
 	PlayerInputHandle.SetDelegateToAction(1);
 	
@@ -105,13 +115,12 @@ void ADungeonCharacter::MoveForward(const float _value)
 		//const FRotator _rotation = Controller->GetControlRotation();
 		//const FRotator _yawRot(0.f, _rotation.Yaw, 0.f);
 		//const FVector _direction = FRotationMatrix(_yawRot).GetUnitAxis(EAxis::X);
-		
+
+		// Get direction by the Camera direction
 		const FRotator _cameraDir = CameraManager->GetCameraRotation();
 		const FRotator _yawRot(0.f, _cameraDir.Yaw, 0.f);
 		const FVector _direction = FRotationMatrix(_yawRot).GetUnitAxis(EAxis::X);
-		
-		//UE_LOG(LogTemp, Warning, TEXT("Forward: %f"), _direction.X);
-		
+				
 		AddMovementInput(_direction, _value);
 	}
 }
@@ -124,16 +133,14 @@ void ADungeonCharacter::MoveRight(const float _value)
 		//const FRotator _yawRot(0.f, _rotation.Yaw, 0.f);
 		//const FVector _direction = FRotationMatrix(_yawRot).GetUnitAxis(EAxis::Y);
 
+		// Get direction by the Camera direction
 		const FRotator _cameraDir = CameraManager->GetCameraRotation();
 		const FRotator _yawRot(0.f, _cameraDir.Yaw, 0.f);
 		const FVector _direction = FRotationMatrix(_yawRot).GetUnitAxis(EAxis::Y);
 		
-		//UE_LOG(LogTemp, Warning, TEXT("Right  : %f"), _direction.Y);
-
 		AddMovementInput(_direction, _value);
 	}
 }
-
 
 
 void ADungeonCharacter::OnInteractionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -150,15 +157,19 @@ void ADungeonCharacter::OnInteractionBeginOverlap(UPrimitiveComponent* Overlappe
 	
 }
 
-
 void ADungeonCharacter::OnInteractionEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Something has exited Collision!"));
-	//PlayerInputHandle.GetActionDelegate(0).BindUObject(this, &ADungeonCharacter::Interact);
-	PlayerInputHandle.GetActionData(0).Pop();
-	PlayerInputHandle.SetDelegateToAction(0);
+	IInteractable* interactable = Cast<IInteractable>(OtherActor);
+	if (interactable)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Something has exited Collision!"));
+		//PlayerInputHandle.GetActionDelegate(0).BindUObject(this, &ADungeonCharacter::Interact);
+		PlayerInputHandle.GetActionData(0).Pop();
+		PlayerInputHandle.SetDelegateToAction(0);
+	}
 }
+
 
 void ADungeonCharacter::ActivateCharacter()
 {

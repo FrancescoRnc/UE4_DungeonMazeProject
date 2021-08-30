@@ -21,7 +21,10 @@ class UDungeonBuilder : public UInterface
 };
 
 /**
- * 
+ * This interface provides the construction of any Dungeon object by its implementations.
+ * - IDungeonBuilder::BuildDungeon;
+ * - IDungeonBuilder::BuildRooms:
+ * - IDungeonBuilder::BuildDoors: 
  */
 class DUNGEONMAZEPROJECT_API IDungeonBuilder
 {
@@ -30,14 +33,27 @@ class DUNGEONMAZEPROJECT_API IDungeonBuilder
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
+	/**
+	 * This step builds the fundamentals of the Target Dungeon.
+	 * @param sizeX The width of the Dungeon;
+	 * @param sizeY The height of the Dungeon;
+	 */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void BuildDungeon(const int sizeX, const int sizeY);
-	//UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	//void BuildRoom(const FIntVector coords);
-	//UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	//void BuildDoor(const FName& roomFrom, const FName& roomTo);
+
+	/**
+	 * This step builds all the Rooms to form, your Dungeon.
+	 * @param _assets The Asset that give form to the Rooms;
+	 * @param inGrid The Array of values for creating Rooms;
+	 */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void BuildRooms(ULevelRoomContentInfo* _asset, const TArray<FIntVector>& coords);
+	void BuildRooms(const TArray<ULevelRoomContentInfo*>& _assets, const TArray<int>& inGrid);
+
+	/**
+	* This step builds all the Doors that link your Rooms;
+	* @param _asset The Asset that give form to the Doors;
+	* @param _inGrid The Array of Values reference from the Grid;
+	*/
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void BuildDoors(UInteractableData* _asset, const TArray<int>& inGrid);
+	void BuildDoors(UInteractableData* _asset, const TArray<int>& _inGrid);
 };

@@ -25,24 +25,7 @@ AInteractableObject::AInteractableObject()
     
     BoxInteractionCollider->SetBoxExtent(ObjectInfo->ColliderSize);
     BoxInteractionCollider->SetCollisionProfileName("Interaction");
-	
-	
-	//ObjectInfo->Delegate.BindUFunction(this, "Interact_Implementation");
 }
-
-// Called when the game starts or when spawned
-//void AInteractableObject::BeginPlay()
-//{
-//	Super::BeginPlay();
-//	
-//}
-
-// Called every frame
-//void AInteractableObject::Tick(float DeltaTime)
-//{
-//	Super::Tick(DeltaTime);
-//
-//}
 
 void AInteractableObject::Interact_Implementation()
 {

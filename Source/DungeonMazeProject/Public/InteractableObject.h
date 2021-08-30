@@ -15,7 +15,7 @@
 
 
 UCLASS(BlueprintType)
-class DUNGEONMAZEPROJECT_API UInteractableData : public UDataAsset, public IInteractable
+class DUNGEONMAZEPROJECT_API UInteractableData : public UDataAsset//, public IInteractable
 {
 	GENERATED_BODY()
 
@@ -30,16 +30,8 @@ class DUNGEONMAZEPROJECT_API UInteractableData : public UDataAsset, public IInte
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UStaticMesh* StaticMesh;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FInteractionDelegate Delegate;
-
-	UFUNCTION(BlueprintCallable)
-	void doSomething()
-	{
-		Delegate.ExecuteIfBound();
-	}
-
 	
+	virtual void DoThis() { UE_LOG(LogTemp, Warning, TEXT("From interactableData!")); }
 };
 
 UCLASS(BlueprintType)
@@ -52,11 +44,9 @@ class DUNGEONMAZEPROJECT_API UDoorInteractableData : public UInteractableData
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FName NextRoomName;
 
-	virtual void Interact_Implementation() override
-	{
-		UGameplayStatics::OpenLevel(GetWorld(), NextRoomName);
-	}
-		
+
+	virtual void DoThis() override { UE_LOG(LogTemp, Warning, TEXT("From DoorinteractableData!")); };
+
 };
 
 UCLASS(BlueprintType)
@@ -69,10 +59,10 @@ class DUNGEONMAZEPROJECT_API UCrateInteractableData : public UInteractableData
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FString Content;
 
-	virtual void Interact_Implementation() override
-	{
-		UE_LOG(LogTemp, Warning, TEXT("YOU OPENED A TREASURE CHEST !!!"));
-	}
+	//virtual void Interact_Implementation() override
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("YOU OPENED A TREASURE CHEST !!!"));
+	//}
 };
 
 
@@ -86,24 +76,17 @@ public:
 	// Sets default values for this actor's properties
 	AInteractableObject();
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Object Data Info")
+	UInteractableData* ObjectInfo;
+	
 	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, Category="Components")
 	UStaticMeshComponent* StaticMesh;
 
 	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, Category="Components")
 	UBoxComponent* BoxInteractionCollider;
+
 	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Object Data Info")
-	UInteractableData* ObjectInfo;
-
-protected:
-	// Called when the game starts or when spawned
-	//virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	//virtual void Tick(float DeltaTime) override;
-
 	virtual void Interact_Implementation() override;
 
-
+	FInteractionDelegate InteractDelegate;
 };

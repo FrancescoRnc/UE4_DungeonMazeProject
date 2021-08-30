@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/TriggerBox.h"
 #include "GameFramework/GameModeBase.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -21,17 +22,12 @@ class DUNGEONMAZEPROJECT_API ADungeonMazeProjectGameModeBase : public AGameModeB
 
 	ADungeonMazeProjectGameModeBase();
 
+	UFUNCTION(BlueprintCallable)
+	void ChangeCharacterLocation(ACharacter* _character, const FTransform& _refTransform);
 	
-	//UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	//TMap<FName, ULevelRoomContentInfo> RoomsInfo;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FName CurrentRoomName;
-	
-	
-
+	protected:
 	virtual void BeginPlay() override;
 
-
-	void LoadNewRoom(const FName newRoomName);
+	
+	
 };

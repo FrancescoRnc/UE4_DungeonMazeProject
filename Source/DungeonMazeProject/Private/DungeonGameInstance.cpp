@@ -8,8 +8,14 @@ UDungeonGameInstance::UDungeonGameInstance()
 	ConstructorHelpers::FObjectFinder<UInteractableData> tmpI(TEXT("InteractableData'/Game/DataAssets/DA_DungeonDoor.DA_DungeonDoor'"));
 	InteractabeAssets.Add("Door", tmpI.Object);
 
-	ConstructorHelpers::FObjectFinder<ULevelRoomContentInfo> tmpR(TEXT("LevelRoomContentInfo'/Game/DataAssets/DA_GeneratedRoom.DA_GeneratedRoom'"));
-	RoomAssets.Add("Generated", tmpR.Object);
+	ConstructorHelpers::FObjectFinder<ULevelRoomContentInfo> tmpRG(TEXT("LevelRoomContentInfo'/Game/DataAssets/DA_GeneratedRoom.DA_GeneratedRoom'"));
+	RoomAssets.Add("Generated", tmpRG.Object);
+
+	ConstructorHelpers::FObjectFinder<ULevelRoomContentInfo> tmpRS(TEXT("LevelRoomContentInfo'/Game/DataAssets/DA_StartRoom.DA_StartRoom'"));
+	RoomAssets.Add("Start", tmpRS.Object);
+
+	ConstructorHelpers::FObjectFinder<ULevelRoomContentInfo> tmpRE(TEXT("LevelRoomContentInfo'/Game/DataAssets/DA_EndRoom.DA_EndRoom'"));
+	RoomAssets.Add("End", tmpRE.Object);
 }
 
 void UDungeonGameInstance::SaveDungeonRoomsData(const FDungeonInfo& dungeon, const TArray<FRoomInfo>& rooms)

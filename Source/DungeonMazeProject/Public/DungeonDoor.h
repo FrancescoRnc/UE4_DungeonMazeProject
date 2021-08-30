@@ -13,7 +13,7 @@
 
 
 UENUM(BlueprintType)
-enum class ERoomCardinals : uint8 { NORTH = 0, SOUTH = 1, EAST = 2, WEST = 3  };
+enum class ERoomCardinals : uint8 { NORTH = 0, EAST = 1, WEST = 2, SOUTH = 3, MAX = 4  };
 
 
 USTRUCT(BlueprintType)
@@ -46,9 +46,6 @@ public:
 	// Sets default values for this actor's properties
 	ADungeonDoor();
 
-	//UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	//UInteractableData* DoorData;
-
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	FDoorInfo Info;
 
@@ -56,7 +53,7 @@ public:
 	UStaticMeshComponent* MeshComponent;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	UBoxComponent* BoxInteractionColision;
+	UBoxComponent* BoxInteractionCollision;
 
 	UPROPERTY(BlueprintReadOnly, VisibleInstanceOnly)
 	FName CurrentLevelName;
@@ -64,19 +61,25 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditInstanceOnly)
 	FName NextLevelName;
 
-	//UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	//UInteractableData Data;
+	UPROPERTY(BlueprintReadWrite, EditInstanceOnly)
+	float DistanceFromDoor;
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	UPROPERTY(BlueprintReadOnly, VisibleInstanceOnly)
+	ADungeonDoor* LinkedDoor;
 
-public:	
-	// Called every frame
-	//virtual void Tick(float DeltaTime) override;
+	FInteractionDelegate InteractDelegate;
+
+	
+	UFUNCTION(BlueprintCallable)
+    void Initialize(const FDoorInfo& _info);
+
+	UFUNCTION(BlueprintCallable)
+	void GoToRoom(ACharacter* character);
 
 	virtual void Interact_Implementation() override;
-
-
-	void Initialize(const FDoorInfo& _info);
+	
+	
+	protected:
+    
+	virtual void BeginPlay() override;
 };
