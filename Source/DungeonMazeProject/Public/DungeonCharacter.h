@@ -13,6 +13,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "InputHandle.h"
+#include "NavigationInvokerComponent.h"
 
 #include "DungeonCharacter.generated.h"
 
@@ -39,6 +40,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	class USpringArmComponent* SpringArm;
+
+	//UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	//class UNavigationInvokerComponent* NavigationInvoker;
 
 	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
 	APlayerCameraManager* CameraManager;

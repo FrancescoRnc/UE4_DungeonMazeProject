@@ -65,7 +65,7 @@ struct DUNGEONMAZEPROJECT_API FRoomInfo
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FName Name = L"None";
+	FName Name = NAME_None;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	ULevelRoomContentInfo* RoomAsset = nullptr;
@@ -126,7 +126,7 @@ struct DUNGEONMAZEPROJECT_API FNewLevelInstanceParams
 	FRotator Rotation;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString OptionalLevelNameOverride = L"";
+	FString OptionalLevelNameOverride = TEXT("");
 };
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -312,7 +312,7 @@ class DUNGEONMAZEPROJECT_API UDungeonInfoBuilder : public UObject, public IDunge
 	private:
 	
 	UPROPERTY()
-	FDungeonInfo outDungeon;
+	FDungeonInfo OutDungeon;
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -340,10 +340,10 @@ public:
 	int GridHeight;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	TMap<FName, ARoom*> refRooms;
+	TMap<FName, ARoom*> RefRooms;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	TArray<ADungeonDoor*> refAllDoors;
+	TArray<ADungeonDoor*> RefAllDoors;
 	
 	UPROPERTY(BlueprintReadWrite, VisibleDefaultsOnly)
     UDungeonInfoBuilder* Builder;
@@ -365,7 +365,7 @@ public:
 	void BuildAndGenerate();
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	FDungeonInfo info;
+	FDungeonInfo Info;
 
 
 	protected:

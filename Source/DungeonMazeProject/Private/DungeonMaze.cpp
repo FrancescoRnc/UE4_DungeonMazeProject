@@ -16,9 +16,9 @@ ARoom::ARoom()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	RootComponent = CreateDefaultSubobject<USceneComponent>("Root Component");
-	PlatformMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("Platform");
-	WallsMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("Walls");
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
+	PlatformMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Platform"));
+	WallsMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Walls"));
 	
 	PlatformMeshComponent->SetupAttachment(RootComponent);
 	WallsMeshComponent->SetupAttachment(RootComponent);
@@ -57,75 +57,89 @@ TArray<ADungeonDoor*> ARoom::GenerateDoors(const TArray<FDoorInfo>& _info)
 {
 	TArray<ADungeonDoor*> _doors;
 	
-	const auto doorAsset = Cast<UDungeonGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()))->InteractabeAssets["Door"];
-	const FVector _actorlocation = GetActorLocation();
-	const FVector _actorforward = GetActorForwardVector();
-	const FVector _actorright = GetActorRightVector();
-	const int _infolenght = _info.Num();
+	const UInteractableData* DoorAsset = Cast<UDungeonGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()))->InteractabeAssets[TEXT("Door")];
+	const FVector Actorlocation = GetActorLocation();
+	const FVector Actorforward = GetActorForwardVector();
+	const FVector Actorright = GetActorRightVector();
+	const int Infolenght = _info.Num();
 
-	FVector loc{};
-	FRotator rot{};
+	FVector Location{};
+	FRotator Rotation{};
 	
-	for (int i = 0; i < _infolenght; i++)
+	for (int i = 0; i < Infolenght; i++)
 	{		
-		loc = {};
-		rot = {};
+		Location = {};
+		Rotation = {};
+		FString StrDirection = TEXT("");
+		FName DirectionName("");
 		
 		switch (_info[i].Direction)
 		{
 			case ERoomCardinals::NORTH:
-				if (PlatformMeshComponent->DoesSocketExist("North"))
+				StrDirection = TEXT("North");
+				DirectionName = *StrDirection;
+				//dir = "North";
+				if (PlatformMeshComponent->DoesSocketExist(DirectionName))
 				{
-					loc = PlatformMeshComponent->GetSocketLocation("North");
-                    rot = PlatformMeshComponent->GetSocketRotation("North");
+					Location = PlatformMeshComponent->GetSocketLocation(DirectionName);
+                    Rotation = PlatformMeshComponent->GetSocketRotation(DirectionName);
 				}
 				else
 				{
-					loc = _actorlocation + (_actorforward * 1900.f);
-                    rot = FRotator::MakeFromEuler({0, 0, 0});
+					Location = Actorlocation + (Actorforward * 1900.f);
+                    Rotation = FRotator::MakeFromEuler({0, 0, 0});
 				}				
 				break;
 			case ERoomCardinals::SOUTH:
-				if (PlatformMeshComponent->DoesSocketExist("South"))
+				StrDirection = TEXT("South");
+				DirectionName = *StrDirection;
+				//dir = "South";
+				if (PlatformMeshComponent->DoesSocketExist(DirectionName))
 				{
-					loc = PlatformMeshComponent->GetSocketLocation("South");
-					rot = PlatformMeshComponent->GetSocketRotation("South");
+					Location = PlatformMeshComponent->GetSocketLocation(DirectionName);
+					Rotation = PlatformMeshComponent->GetSocketRotation(DirectionName);
 				}
 				else
 				{
-					loc = _actorlocation + (_actorforward * -1900.f);
-					rot = FRotator::MakeFromEuler({0, 0, 180});
+					Location = Actorlocation + (Actorforward * -1900.f);
+					Rotation = FRotator::MakeFromEuler({0, 0, 180});
 				}
 				break;
 			case ERoomCardinals::EAST:
-				if (PlatformMeshComponent->DoesSocketExist("East"))
+				StrDirection = TEXT("East");
+				DirectionName = *StrDirection;
+				//dir = "East";
+				if (PlatformMeshComponent->DoesSocketExist(DirectionName))
 				{
-					loc = PlatformMeshComponent->GetSocketLocation("East");
-					rot = PlatformMeshComponent->GetSocketRotation("East");
+					Location = PlatformMeshComponent->GetSocketLocation(DirectionName);
+					Rotation = PlatformMeshComponent->GetSocketRotation(DirectionName);
 				}
 				else
 				{
-					loc = _actorlocation + (_actorright * 1900.f);
-					rot = FRotator::MakeFromEuler({0, 0, 90});
+					Location = Actorlocation + (Actorright * 1900.f);
+					Rotation = FRotator::MakeFromEuler({0, 0, 90});
 				}
 				break;
 			case ERoomCardinals::WEST:
-				if (PlatformMeshComponent->DoesSocketExist("West"))
+				StrDirection = TEXT("West");
+				DirectionName = *StrDirection;
+				//dir = "West";
+				if (PlatformMeshComponent->DoesSocketExist(DirectionName))
 				{
-					loc = PlatformMeshComponent->GetSocketLocation("West");
-					rot = PlatformMeshComponent->GetSocketRotation("West");
+					Location = PlatformMeshComponent->GetSocketLocation(DirectionName);
+					Rotation = PlatformMeshComponent->GetSocketRotation(DirectionName);
 				}
 				else
 				{
-					loc = _actorlocation + (_actorright * -1900.f);
-					rot = FRotator::MakeFromEuler({0, 0, -90});
+					Location = Actorlocation + (Actorright * -1900.f);
+					Rotation = FRotator::MakeFromEuler({0, 0, -90});
 				}
 				break;
 			default: break;
 		}		
 		
-		FActorSpawnParameters spawn;
-		ADungeonDoor* newDoor = GetWorld()->SpawnActor<ADungeonDoor>(loc, rot, spawn);
+		FActorSpawnParameters SpawnParameters;
+		ADungeonDoor* newDoor = GetWorld()->SpawnActor<ADungeonDoor>(Location, Rotation, SpawnParameters);
 		newDoor->Initialize(_info[i]);		
 		
 		Doors[newDoor->Info.Direction] = newDoor;
@@ -204,7 +218,7 @@ void ARoomLinker::OnSecondTriggerBeginOverlap(UPrimitiveComponent* OverlappedCom
 
 void ARoomLinker::GoToFirstRoom()
 {
-	auto player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	ACharacter* player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	FVector newpos = DoorOne->GetComponentLocation() + (DoorOne->GetForwardVector() * 200) + FVector(0, 0, 100);
 	
 	player->SetActorLocation(newpos);
@@ -212,7 +226,7 @@ void ARoomLinker::GoToFirstRoom()
 
 void ARoomLinker::GoToSecondRoom()
 {
-	auto player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	ACharacter* player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	FVector newpos = DoorTwo->GetComponentLocation() + (DoorTwo->GetForwardVector() * 200) + FVector(0, 0, 100);
 	
 	player->SetActorLocation(newpos);
@@ -238,7 +252,7 @@ void ADungeonMaze::BeginPlay()
 
 void ADungeonMaze::CreateDungeonInfo()
 {
-	const auto gameInstance = Cast<UDungeonGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	const UDungeonGameInstance* gameInstance = Cast<UDungeonGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	//const auto _genroomasset = gameInstance->RoomAssets["Generated"];
 	TArray<ULevelRoomContentInfo*> _roomassets =
 	{
@@ -246,11 +260,11 @@ void ADungeonMaze::CreateDungeonInfo()
 		gameInstance->RoomAssets["Generated"],
 		gameInstance->RoomAssets["End"]
 	};
-	const auto _doorasset = gameInstance->InteractabeAssets["Door"];
+	UInteractableData* _doorasset = gameInstance->InteractabeAssets["Door"];
 	
 	Builder->BuildDungeon_Implementation(GridWidth, GridHeight);
-	const auto gridValues = Builder->GetGridValues(GridWidth, GridHeight);
-	const auto gridCoords = Builder->GetRoomsCoordsByValues(gridValues);
+	const TArray<int> gridValues = Builder->GetGridValues(GridWidth, GridHeight);
+	const TArray<FIntVector> gridCoords = Builder->GetRoomsCoordsByValues(gridValues);
 	Builder->BuildRooms_Implementation(_roomassets, gridValues);
 	Builder->BuildDoors_Implementation(_doorasset, gridValues);
 	
@@ -258,7 +272,7 @@ void ADungeonMaze::CreateDungeonInfo()
 
 void ADungeonMaze::GenerateDungeonFromInfo(const FDungeonInfo& dungeoninfo)
 {
-	auto _world = GetWorld();
+	UWorld* _world = GetWorld();
 	
 	FNewLevelInstanceParams params;
 	for (int i = 0; i < dungeoninfo.RoomsCount; i++)
@@ -271,26 +285,25 @@ void ADungeonMaze::GenerateDungeonFromInfo(const FDungeonInfo& dungeoninfo)
 		FActorSpawnParameters parameters;
 		parameters.Name = _roominfo.Name;
 
-		auto newRoom = _world->SpawnActor<ARoom>(_pos, _rot, parameters);
+		ARoom* NewRoom = _world->SpawnActor<ARoom>(_pos, _rot, parameters);
 
-		newRoom->GenerateRoom(dungeoninfo.Rooms[i]);
-		auto _doors =
-			newRoom->GenerateDoors(dungeoninfo.Rooms[i].Doors);
+		NewRoom->GenerateRoom(dungeoninfo.Rooms[i]);
+		TArray<ADungeonDoor*> _doors = NewRoom->GenerateDoors(dungeoninfo.Rooms[i].Doors);
 				
-		refRooms.Add(_roominfo.Name, newRoom);
-		refAllDoors.Append(_doors);
+		RefRooms.Add(_roominfo.Name, NewRoom);
+		RefAllDoors.Append(_doors);
  	}
 	
-	for (auto door : refAllDoors)
+	for (ADungeonDoor* Door : RefAllDoors)
 	{
-		ARoom* refnextroom = refRooms[door->Info.RoomDestinationName];
+		ARoom* RefNextRoom = RefRooms[Door->Info.RoomDestinationName];
 
-		const uint8 cardinalscount = (uint8)(ERoomCardinals::MAX);
-		const uint8 currentcardinal = (uint8)(door->Info.Direction);
-		const uint8 intoppositecardinal = (cardinalscount - 1) - currentcardinal;
+		const uint8 CardinalsCount = static_cast<uint8>(ERoomCardinals::MAX);
+		const uint8 CurrentCardinal = static_cast<uint8>(Door->Info.Direction);
+		const uint8 IntOppositeCardinal = (CardinalsCount - 1) - CurrentCardinal;
 
-		const ERoomCardinals oppositecardinal = (ERoomCardinals)intoppositecardinal;
-		door->LinkedDoor = refnextroom->Doors[oppositecardinal];
+		const ERoomCardinals OppositeCardinal = static_cast<ERoomCardinals>(IntOppositeCardinal);
+		Door->LinkedDoor = RefNextRoom->Doors[OppositeCardinal];
 	}
 }
 
@@ -298,13 +311,13 @@ void ADungeonMaze::BuildAndGenerate()
 {
 	Builder = NewObject<UDungeonInfoBuilder>();
 	CreateDungeonInfo();
-	info = Builder->GetDungeon();
+	Info = Builder->GetDungeon();
 	
-	auto gameInstance = Cast<UDungeonGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-	gameInstance->SaveDungeonRoomsData(info, info.Rooms);
-	gameInstance->refDungeon = this;
+	UDungeonGameInstance* GameInstance = Cast<UDungeonGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	GameInstance->SaveDungeonRoomsData(Info, Info.Rooms);
+	GameInstance->refDungeon = this;
 	
-	GenerateDungeonFromInfo(info);
+	GenerateDungeonFromInfo(Info);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -313,67 +326,67 @@ void ADungeonMaze::BuildAndGenerate()
 // Campain Dungeon Builder
 UDungeonInfoBuilder::UDungeonInfoBuilder()
 {
-  	outDungeon = {};
+  	OutDungeon = {};
 }
 
 void UDungeonInfoBuilder::BuildDungeon_Implementation(const int sizeX, const int sizeY)
 {
-	outDungeon.GridWidth = sizeX;
-	outDungeon.GridHeight = sizeY;
+	OutDungeon.GridWidth = sizeX;
+	OutDungeon.GridHeight = sizeY;
 }
 
 void UDungeonInfoBuilder::BuildRooms_Implementation(const TArray<ULevelRoomContentInfo*>& _assets, const TArray<int>& inGrid)
 {
 	// .X -> x; .Y -> y; .Z -> index in grid; .W -> value on grid[index] 
-	TArray<FIntVector4> _coordsPack;
+	TArray<FIntVector4> CoordsPack;
 	FIntVector4 tmp(0, 0, 0, 0);
 	
-	const int _gridlength = inGrid.Num();	
-	for (int i = 0; i < _gridlength; i++)
+	const int Gridlength = inGrid.Num();	
+	for (int i = 0; i < Gridlength; i++)
 	{
 		if (inGrid[i] > 0)
 		{
-			tmp = {	i / outDungeon.GridWidth,
-						i % outDungeon.GridWidth,
+			tmp = {	i / OutDungeon.GridWidth,
+						i % OutDungeon.GridWidth,
 						i,
 						(inGrid[i] - 1)
 			};			
-			_coordsPack.Add(tmp);
+			CoordsPack.Add(tmp);
 		}
 	}
 
-	const int _coordslenght = _coordsPack.Num();
-	for (int i = 0; i < _coordslenght; i++)
+	const int Coordslenght = CoordsPack.Num();
+	for (int i = 0; i < Coordslenght; i++)
 	{
-		FString _roomname("Room_");
-        _roomname.Append(FString::FromInt(i));
-        FName roomName(_roomname);
-		const int gridindex = _coordsPack[i].Z;
+		FString RoomNameStr("Room_");
+        RoomNameStr.Append(FString::FromInt(i));
+        FName RoomName(*RoomNameStr);
+		const int Gridindex = CoordsPack[i].Z;
         
-        FRoomInfo roomInfo;		
-        roomInfo.Name = roomName;
-		roomInfo.RoomAsset = _assets[_coordsPack[i].W];
-		roomInfo.GridIndex = gridindex;
-        roomInfo.GridCoords = {_coordsPack[i].X, _coordsPack[i].Y, 0};
-		roomInfo.RoomSize = _assets[_coordsPack[i].W]->RoomSize;
+        FRoomInfo RoomInfo;		
+        RoomInfo.Name = RoomName;
+		RoomInfo.RoomAsset = _assets[CoordsPack[i].W];
+		RoomInfo.GridIndex = Gridindex;
+        RoomInfo.GridCoords = {CoordsPack[i].X, CoordsPack[i].Y, 0};
+		RoomInfo.RoomSize = _assets[CoordsPack[i].W]->RoomSize;
         
-        outDungeon.Rooms.Add(roomInfo);
+        OutDungeon.Rooms.Add(RoomInfo);
         
 	}
-	outDungeon.RoomsCount = outDungeon.Rooms.Num();
+	OutDungeon.RoomsCount = OutDungeon.Rooms.Num();
 }
 
 void UDungeonInfoBuilder::BuildDoors_Implementation(UInteractableData* _asset, const TArray<int>& inGrid)
 {
-	const int width = outDungeon.GridWidth;
-	const int height = outDungeon.GridHeight;
+	const int Width = OutDungeon.GridWidth;
+	const int Height = OutDungeon.GridHeight;
 	
-	for (int i = 0; i < outDungeon.RoomsCount; i++)
+	for (int i = 0; i < OutDungeon.RoomsCount; i++)
 	{
 		// Current room info
-		FRoomInfo& room = outDungeon.Rooms[i];
-		const FIntVector currCoords = room.GridCoords;
-		const int currGridIndex = room.GridIndex; //room.GridCoords.X + (room.GridCoords.Y * width);
+		FRoomInfo& CurrentRoom = OutDungeon.Rooms[i];
+		const FIntVector currCoords = CurrentRoom.GridCoords;
+		const int currGridIndex = CurrentRoom.GridIndex; //room.GridCoords.X + (room.GridCoords.Y * width);
 
 		// Adjacent room coordinates
 		const FIntVector Up{currCoords.X + 1, currCoords.Y, 0};   
@@ -381,41 +394,41 @@ void UDungeonInfoBuilder::BuildDoors_Implementation(UInteractableData* _asset, c
 		const FIntVector Right{currCoords.X, currCoords.Y - 1, 0};
 		const FIntVector Left{currCoords.X, currCoords.Y + 1, 0}; 
 		
-		const int UpIndex = Up.Y + (Up.X * width);
-		const int DownIndex = Down.Y + (Down.X * width);
-		const int RightIndex = Right.Y + (Right.X * width);
-		const int LeftIndex = Left.Y + (Left.X * width);
+		const int UpIndex = Up.Y + (Up.X * Width);
+		const int DownIndex = Down.Y + (Down.X * Width);
+		const int RightIndex = Right.Y + (Right.X * Width);
+		const int LeftIndex = Left.Y + (Left.X * Width);
 		
 		// Check Up
-		if (Up.X < height && inGrid[UpIndex])
-			room.Doors.Add(	{_asset,
+		if (Up.X < Height && inGrid[UpIndex])
+			CurrentRoom.Doors.Add(	{_asset,
 							ERoomCardinals::NORTH,
-							room.Name,
-							GetRoomByCoords(outDungeon.Rooms, Up.X, Up.Y).Name});
+							CurrentRoom.Name,
+							GetRoomByCoords(OutDungeon.Rooms, Up.X, Up.Y).Name});
 		// Check Down
 		if (Down.X >= 0 && inGrid[DownIndex])
-			room.Doors.Add( {_asset,
+			CurrentRoom.Doors.Add( {_asset,
 							ERoomCardinals::SOUTH,
-							room.Name,
-							GetRoomByCoords(outDungeon.Rooms, Down.X, Down.Y).Name});
+							CurrentRoom.Name,
+							GetRoomByCoords(OutDungeon.Rooms, Down.X, Down.Y).Name});
 		// Check Right
 		if (Right.Y >= 0 && inGrid[RightIndex])
-			room.Doors.Add( {_asset,
+			CurrentRoom.Doors.Add( {_asset,
 							ERoomCardinals::EAST,
-							room.Name,
-							GetRoomByCoords(outDungeon.Rooms, Right.X, Right.Y).Name});
+							CurrentRoom.Name,
+							GetRoomByCoords(OutDungeon.Rooms, Right.X, Right.Y).Name});
 		// Check Left
-		if (Left.Y < width && inGrid[LeftIndex])
-			room.Doors.Add( {_asset,
+		if (Left.Y < Width && inGrid[LeftIndex])
+			CurrentRoom.Doors.Add( {_asset,
 							ERoomCardinals::WEST,
-							room.Name,
-							GetRoomByCoords(outDungeon.Rooms, Left.X, Left.Y).Name});
+							CurrentRoom.Name,
+							GetRoomByCoords(OutDungeon.Rooms, Left.X, Left.Y).Name});
 	}
 }
 
 FDungeonInfo& UDungeonInfoBuilder::GetDungeon()
 {
-	return outDungeon;
+	return OutDungeon;
 }
 
 TArray<int> UDungeonInfoBuilder::GetGridValues(const int width, const int height)
@@ -448,7 +461,7 @@ TArray<int> UDungeonInfoBuilder::GetGridValues(const int width, const int height
 
 TArray<FIntVector> UDungeonInfoBuilder::GetRoomsCoordsByValues(const TArray<int>& inValues)
 {
-	TArray<FIntVector> coordinates;
+	TArray<FIntVector> Coordinates;
 	FIntVector tmp(0,0,0);
 	
 	const int length = inValues.Num();
@@ -457,43 +470,43 @@ TArray<FIntVector> UDungeonInfoBuilder::GetRoomsCoordsByValues(const TArray<int>
 	{
 		switch(inValues[i])
 		{
-		case 1: tmp = {	i / outDungeon.GridWidth, i % outDungeon.GridWidth, i};
-			coordinates.Add(tmp);
+		case 1: tmp = {	i / OutDungeon.GridWidth, i % OutDungeon.GridWidth, i};
+			Coordinates.Add(tmp);
 			break;
 			
 		default: break;
 		}
 	}
 
-	return coordinates;
+	return Coordinates;
 }
 
 const FRoomInfo UDungeonInfoBuilder::GetRoomByGridIndex(const TArray<FRoomInfo>& rooms, const int gridindex) const
 {
-	FRoomInfo room{};
+	FRoomInfo RoomInfo{};
 
-	const int _roomscount = rooms.Num();
-	for (int i = 0; i < _roomscount; i++)
+	const int RoomsCount = rooms.Num();
+	for (int i = 0; i < RoomsCount; i++)
 	{
 		if (rooms[i].GridIndex == gridindex)
-			room = rooms[i];
+			RoomInfo = rooms[i];
 	}
 
-	return room;
+	return RoomInfo;
 }
 
 const FRoomInfo UDungeonInfoBuilder::GetRoomByCoords(const TArray<FRoomInfo>& rooms, const int x, const int y) const
 {
-	FRoomInfo room{};
+	FRoomInfo RoomInfo{};
 
-	const int _roomscount = rooms.Num();
-	for (int i = 0; i < _roomscount; i++)
+	const int RoomsCount = rooms.Num();
+	for (int i = 0; i < RoomsCount; i++)
 	{
 		if (rooms[i].GridCoords.X == x && rooms[i].GridCoords.Y == y)
-			room = rooms[i];
+			RoomInfo = rooms[i];
 	}
 
-	return room;
+	return RoomInfo;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -516,9 +529,9 @@ void ADungeonGenerator::BeginPlay()
 
 	Generate();
 
-	TArray<FIntVector> _roomcouples;
+	TArray<FIntVector> RoomCouples;
 	
-	LinkRooms(_roomcouples);
+	LinkRooms(RoomCouples);
 }
 
 void ADungeonGenerator::Generate()
@@ -529,12 +542,12 @@ void ADungeonGenerator::Generate()
 	WallInstances->		ClearInstances();
 	//DoorInstances->		ClearInstances();
 	
-	const int length = GridWidth * GridHeight;
+	const int Length = GridWidth * GridHeight;
 
-	TArray<FTransform> transforms;
-	TArray<FTransform> doortransforms;
-	transforms.Init(GetActorTransform(), length);	
-	doortransforms.Init(GetActorTransform(), length * 4);
+	TArray<FTransform> Transforms;
+	TArray<FTransform> DoorTransforms;
+	Transforms.Init(GetActorTransform(), Length);	
+	DoorTransforms.Init(GetActorTransform(), Length * 4);
 
 	const TArray<FIntVector> cardinals = {
 		{1, 0, 0},
@@ -543,42 +556,42 @@ void ADungeonGenerator::Generate()
 		{-1, 0, 0}
 	};
 	
-	for (int i = 0; i < length; i++)
+	for (int i = 0; i < Length; i++)
 	{
-		const FIntVector currcoords = {i % GridHeight, i / GridHeight, 0};
+		const FIntVector CurrCoords = {i % GridHeight, i / GridHeight, 0};
 		
-		const FVector currloc = GetActorLocation() + FVector(currcoords.X * 5000.f, -currcoords.Y * 5000.f, 0);
+		const FVector CurrLoc = GetActorLocation() + FVector(CurrCoords.X * 5000.f, -CurrCoords.Y * 5000.f, 0);
 		
-		transforms[i].SetLocation(currloc);
+		Transforms[i].SetLocation(CurrLoc);
 
 		for (int j = 0; j < 4; j++)
 		{
-			const FVector currdoorloc;
-			const FQuat currdoorrot;
-			doortransforms[i * j].SetLocation(currdoorloc);
-			doortransforms[i * j].SetRotation(currdoorrot);
+			const FVector CurrDoorLoc;
+			const FQuat CurrDoorTot;
+			DoorTransforms[i * j].SetLocation(CurrDoorLoc);
+			DoorTransforms[i * j].SetRotation(CurrDoorTot);
 		}
 	}
 	
-	FloorInstances->	AddInstances(transforms, false);
-    WallInstances->		AddInstances(transforms, false);
+	FloorInstances->	AddInstances(Transforms, false);
+    WallInstances->		AddInstances(Transforms, false);
 	//DoorInstances->		AddInstances(doortransforms, false);
 
 }
 
 void ADungeonGenerator::LinkRooms(const TArray<FIntVector>& _inroomcouples)
 {
-	auto _world = GetWorld();
+	UWorld* World = GetWorld();
 
-	const auto length = _inroomcouples.Num();
-	for (int i = 0; i < length; i++)
+	const int32 Length = _inroomcouples.Num();
+	for (int i = 0; i < Length; i++)
 	{
-		FVector pos = {};
-		FRotator rot = GetActorForwardVector().Rotation();
+		FVector Location = {};
+		FRotator Rotation = GetActorForwardVector().Rotation();
 		
-		ARoomLinker* linker = _world->SpawnActor<ARoomLinker>(pos, rot);
+		ARoomLinker* Linker = World->SpawnActor<ARoomLinker>(Location, Rotation);
 		
-		linker->LocateDoors({_inroomcouples[i].X, _inroomcouples[i].Y, 0, 0});
+		Linker->LocateDoors({_inroomcouples[i].X, _inroomcouples[i].Y, 0, 0});
 	}
 }
 
