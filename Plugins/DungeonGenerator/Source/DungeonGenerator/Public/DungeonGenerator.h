@@ -3,100 +3,34 @@
 #pragma once
 
 #include "CoreMinimal.h"
-//#include "DungeonBuilderInterface.h"
-#include "RoomData.h"
+#include "DungeonData.h"
+#include "DungeonUtilities.h"
 #include "Modules/ModuleManager.h"
 
 
-static const int32 DGSlateSpacerSize = 10;
 
 
-// Structs
-enum class EWorldDirection : uint8 { NORTH = 0, EAST = 1, WEST = 2, SOUTH = 3, MAX = 4 };
 
-struct FDoorInfo
-{
-	FName SourceRoomName;
-	FName NextRoomName;
-	EWorldDirection Direction;
-
-};
-
-struct FRoomInfo
-{
-	FName RoomName;
-	FIntVector IndexInGrid;
-	TArray<FDoorInfo> DoorsInfo;
-
-};
-
-struct FDungeonInfo
-{
-	TArray<FRoomInfo> RoomsInfo;
-	
-};
-
-
-// IDungeonBuilder Interface
-class IDungeonBuilder
-{
-	public:
-	//virtual ~IDungeonBuilder() = 0;
-
-	virtual void BuildDungeon() = 0;
-	virtual void BuildRooms(TArray<FRoomInfo>& OutRoomsInfo) = 0;
-	virtual void BuildDoors(TArray<FDoorInfo>& OutDoorsInfo) = 0;
-	
-};
-
-
-// FRoomGenerator Class
+/**
+* FRoomGenerator Class
+*/
 class FRoomGenerator
 {
-	public:
-
+public:
 	FRoomGenerator();
 
-	FName PrefabricsPath = TEXT("/Game/Prefabrics");
-
-	FORCEINLINE const class URoomData* GetRoomData(FName Name) const
-	{
-		for (const URoomData* Data : RoomDataAssets)
-		{
-			if (Data->GetFName() == Name)
-			{
-				return Data;
-			}
-		}
-		return nullptr;
-	}
-
-	FORCEINLINE int32 GetAssetNum() const
-	{
-		return RoomDataAssets.Num();
-	}
-
-	void RescanAssetReferences();
-	void CheckAssetReference(const FAssetData& Asset);
-	void RemoveAssetReference(const FAssetData& Asset);
-	bool RGCommandMakeRoom(const FString AssetName);
-
+	FReply DGCommandRoomPreview();
 	
-	//TMap<FName, URoomData*> RoomDataAssets;
-	TArray<URoomData*> RoomDataAssets;
-
-private:
-	TMap<FName, UPackage*> Packages;
-
-
+	class ADungeonRoom* Generate(const FRoomInfo& Info);
 };
 
 
-// FDungeonGenerator Class
+/**
+* FDungeonGenerator CLass
+*/
 class FDungeonGenerator : public IDungeonBuilder
 {
 public:
-
 	FDungeonGenerator();
 	//virtual ~FDungeonGenerator() override;
 
@@ -104,20 +38,20 @@ public:
 	virtual void BuildDungeon() override;
 	virtual void BuildRooms(TArray<FRoomInfo>& OutRoomsInfo) override;
 	virtual void BuildDoors(TArray<FDoorInfo>& OutDoorsInfo) override;
-	//virtual void BuildDungeon_Implementation() override;
-	//virtual void BuildRooms_Implementation() override;
-	//virtual void BuildDoors_Implementation() override;
-
-	const FDungeonInfo& GetDungeonInfo() const;
-
+	
+	FORCEINLINE const FDungeonInfo& GetDungeonInfo() const
+	{
+		return OutDungeonInfo;
+	}
 
 private:
-
 	FDungeonInfo OutDungeonInfo;
 };
 
 
-// FDungeonGeneratorModule Class
+/**
+* FDungeonGeneratorModule Module Class
+*/
 class FDungeonGeneratorModule : public IModuleInterface, public FSelfRegisteringExec
 {
 public:	
@@ -132,15 +66,27 @@ public:
 	TSharedRef<class SDockTab> SpawnNomadTab(const FSpawnTabArgs& TabSpawnArgs);
 
 
-private:
+private:	
+	const FName DungeonGeneratorTabName = TEXT("Dungeon Generator");
+    const int32 DGSpacerSize = 10;
+    const int32 HPadding = 10;
+    const int32 VPadding = 10;
+	
 	TSharedPtr<FDungeonGenerator> DungeonGenerator;
-	TSharedPtr<class FRoomGenerator> RoomGenerator;
-	FName DungeonGeneratorTabName = TEXT("Dungeon Generator");
-
+	TSharedPtr<FRoomGenerator> RoomGenerator;
+	TSharedPtr<FDungeonUtils> DungeonUtils;
+	
+	FDungeonInfo CurrentDungeonInfo;
+	TArray<FRoomInfo> RoomsInfo;
+	TArray<FDoorInfo> DoorsInfo;
+	
+	
 	FReply DGCommandGenerate();
     FReply DGCommandSave();
+	FReply DGCommandReset();
 	FReply DGCommandPreview();
-
-	void RGCommandMakeRoom(const FText& InText, ETextCommit::Type inCommitType);
+	FReply DGCommandRoomPreview();
 	
+	void RGCommandMakeRoom(const FText& InText, ETextCommit::Type InCommitType);
+
 };

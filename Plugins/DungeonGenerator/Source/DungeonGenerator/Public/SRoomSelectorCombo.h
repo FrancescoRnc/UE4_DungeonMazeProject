@@ -40,26 +40,35 @@ class DUNGEONGENERATOR_API SRoomSelectorCombo : public SCompoundWidget
 				.Text_Lambda([this]() -> FText
 				{
 					return CurrentOption ? FText::FromString(*CurrentOption->GetName()) : LOCTEXT("None", "None");
+					//return OnOptionDisplay.Execute();
 				})
 			]
-			//SNew(STextBlock).Text(LOCTEXT("None", "None"))
-		];
-	
+		];	
 	}
-
-	//void AddOptionItem(TSelectorComboType Item);
+	
 	void OnSelectionChanged(TSelectorComboType NewValue, ESelectInfo::Type)
-	{
+	{		
 		CurrentOption = NewValue;
+		OnOptionSelected.Execute(NewValue);
 	}
 	
 	TSharedRef<SWidget> MakeWidgetForOption(TSelectorComboType InOption)
 	{
 		return SNew(STextBlock).Text(FText::FromString(*InOption->GetName()));
+		//return OnMakingWidget.Execute(InOption);
 	}
 
 	TArray<TSelectorComboType>* Options;
 	TSelectorComboType CurrentOption;
+
+	DECLARE_DELEGATE_OneParam(FOnOptionSelected, TSelectorComboType)
+	FOnOptionSelected OnOptionSelected;
+
+	DECLARE_DELEGATE_RetVal(FText, FOnOptionDisplay)
+	FOnOptionDisplay OnOptionDisplay;
+
+	DECLARE_DELEGATE_RetVal_OneParam(TSharedRef<SWidget>, FOnMakingWidget, TSelectorComboType)
+	FOnMakingWidget OnMakingWidget;
 };
 
 #undef LOCTEXT_NAMESPACE

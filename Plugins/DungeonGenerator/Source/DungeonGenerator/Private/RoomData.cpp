@@ -3,7 +3,12 @@
 
 #include "RoomData.h"
 
-URoomData::URoomData()
+URoomPreset::URoomPreset()
 {
-	
+	//PresetID = FMath::Rand();
+}
+
+void URoomPreset::DoThings()
+{
+	UE_LOG(LogTemp, Warning, TEXT("I am Doing Things"))
 }

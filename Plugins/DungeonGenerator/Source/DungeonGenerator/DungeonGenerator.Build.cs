@@ -38,7 +38,8 @@ public class DungeonGenerator : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"InputCore"
+				"InputCore",
+				"UnrealEd"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
