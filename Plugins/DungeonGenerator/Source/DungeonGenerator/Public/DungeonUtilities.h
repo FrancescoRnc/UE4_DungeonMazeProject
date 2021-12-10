@@ -20,8 +20,8 @@ public:
 	//virtual ~IDungeonBuilder() = 0;
 
 	virtual void BuildDungeon() = 0;
-	virtual void BuildRooms(TArray<FRoomInfo>& OutRoomsInfo/*, const TArray<URoomPresetPtr>& Presets*/) = 0;
-	virtual void BuildDoors(TArray<FDoorInfo>& OutDoorsInfo) = 0;
+	virtual void BuildRooms() = 0;
+	virtual void BuildDoors() = 0;
 	
 };
 
@@ -35,11 +35,16 @@ public:
 	FDungeonUtils();	
 
 	const FName PrefabricsPath = TEXT("/Game/Prefabrics");
-	const FName DungeonDataPath = TEXT("/Game/DungeonData/PremadeMaps");
+	const FName DungeonDataPath = TEXT("/Game/DungeonData");
 
 	TMap<int32, URoomPresetPtr> RoomPresetsMap;
 	TArray<URoomPresetPtr> RoomPresets;
+	TArray<FName> RoomPresetPaths;
 	URoomPresetPtr SelectedPreset;
+
+	class UDungeonData* CurrentDungeonFile;
+	FName CurrentDungeonPath;
+	UPackage* DungeonPackage;
 	
 
 	void GetPresetsOnLoad();
@@ -49,6 +54,9 @@ public:
 	
 	const bool RescanAssetReferences() const;
 	bool RGCommandMakeRoom(const FString AssetName);
+	UDungeonData* SaveNewDungeonData(const struct FDungeonInfo& Info);
+	UDungeonData* GetDungeonDataAsset();
+	
 	// Obsolete	
 	void CheckAssetReference(const FAssetData& Asset);
 	// Obsolete
@@ -84,7 +92,7 @@ public:
 
 private:	
 	
-	TMap<FName, UPackage*> Packages;
+	TMap<FName, UPackage*> PresetPackages;
 	
 
 public:

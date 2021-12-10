@@ -128,6 +128,10 @@ FGrid::FGrid()
 FGrid::~FGrid()
 {
 	Cells.Empty();
+	PathTrack.Empty();
+	CellIndexLinks.Empty();
+	Size = {0,0,0};
+	Length = PathLength = 0;
 }
 
 // Grid

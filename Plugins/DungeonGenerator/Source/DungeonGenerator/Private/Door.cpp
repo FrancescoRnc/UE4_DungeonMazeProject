@@ -1,32 +1,39 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+#include "Door.h"
 #include "DungeonRoom.h"
-#include "DungeonGenerator.h"
 
 // Sets default values
-ADungeonRoom::ADungeonRoom()
+ADoor::ADoor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
-	FloorMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Floor Mesh"));
-	WallsMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Walls Mesh"));
+	DoorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Door Mesh"));
+	InteractionCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Interaction Collider"));
 
-	FloorMeshComponent->SetupAttachment(RootComponent);
-	WallsMeshComponent->SetupAttachment(RootComponent);
+	DoorMesh->SetupAttachment(RootComponent);
+	InteractionCollider->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
-void ADungeonRoom::BeginPlay()
+void ADoor::BeginPlay()
 {
 	Super::BeginPlay();
+	
 }
 
 // Called every frame
-//void ADungeonRoom::Tick(float DeltaTime)
+//void ADoor::Tick(float DeltaTime)
 //{
 //	Super::Tick(DeltaTime);
 //
 //}
+
+
+void ADoor::Teleport()
+{
+	
+}

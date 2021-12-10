@@ -5,7 +5,7 @@
 
 URoomPreset::URoomPreset()
 {
-	//PresetID = FMath::Rand();
+	
 }
 
 void URoomPreset::DoThings()

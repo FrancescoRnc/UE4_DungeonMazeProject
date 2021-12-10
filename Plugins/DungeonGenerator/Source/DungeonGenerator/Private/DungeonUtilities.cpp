@@ -1,6 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DungeonUtilities.h"
+
+#include "Door.h"
+#include "DungeonData.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 
 
@@ -33,6 +36,9 @@ void FDungeonUtils::AddAssetReference(URoomPresetPtr NewPreset)
 	NewPreset->PresetID = FMath::Rand();
 	RoomPresets.Add(NewPreset);
 	RoomPresetsMap.Add(NewPreset->PresetID, NewPreset);
+	RoomPresetPaths.Add(*NewPreset->GetPathName());
+	PresetPackages.Add(*NewPreset->GetPackage()->GetName(),
+				NewPreset->GetPackage());
 }
 
 void FDungeonUtils::DeleteAssetReference(URoomPresetPtr NewPreset)
@@ -41,6 +47,8 @@ void FDungeonUtils::DeleteAssetReference(URoomPresetPtr NewPreset)
 	{
 		RoomPresets.Remove(NewPreset);
 		RoomPresetsMap.Remove(NewPreset->PresetID);
+		RoomPresetPaths.Remove(*NewPreset->GetPathName());
+		PresetPackages.Remove(*NewPreset->GetPackage()->GetName());
 	}
 }
 
@@ -135,7 +143,8 @@ bool FDungeonUtils::RGCommandMakeRoom(const FString AssetName)
 	//NewRoom->AddToRoot();
 	
 	AddAssetReference(NewRoom);
-	Packages.Add(*PackageName, Package);
+	//RoomPresetPaths.Add(*NewRoom->GetPathName());
+	//PresetPackages.Add(*PackageName, Package);
 
 	const FString Filename = FPackageName::LongPackageNameToFilename(
 		Package->GetName(), FPackageName::GetAssetPackageExtension());
@@ -145,4 +154,78 @@ bool FDungeonUtils::RGCommandMakeRoom(const FString AssetName)
 	Package->MarkPackageDirty();
 
 	return true;
+}
+
+UDungeonData* FDungeonUtils::SaveNewDungeonData(const FDungeonInfo& Info)
+{
+	const FString Path = DungeonDataPath.ToString();
+	const FString AssetName = TEXT("CurrentDungeon");
+	const FString PackageName = FString::Printf(TEXT("%s_Pkg"), *AssetName);
+	const FString PackagePath = FString::Printf(TEXT("%s/%s"), *Path, *PackageName);
+	const FString FullPathName = FString::Printf(TEXT("%s.%s"), *PackagePath, *AssetName);
+
+	UDungeonData* Data;
+	UPackage* Package;
+	if (FAssetRegistryModule::GetRegistry().PathExists(FullPathName))
+	{
+		const FAssetData AssetData = FAssetRegistryModule::GetRegistry().GetAssetByObjectPath(*PackagePath);
+		Package = AssetData.GetPackage();
+		Data = Cast<UDungeonData>(AssetData.GetAsset());
+	}
+	else
+	{
+		Package = CreatePackage(*PackagePath);
+		Data = NewObject<UDungeonData>(Package, *AssetName, RF_Public | RF_Standalone);
+	}
+
+	// Generate Data
+	Data->GridSize = Info.GridSize;
+	Data->PathLength = Info.RoomsInfo.Num();
+	Data->GridScheme = Info.GridScheme;
+	Data->RoomsPresetID.Init(-1, Data->PathLength);
+	Data->RoomsPresetPaths.Init(NAME_None, Data->PathLength);
+	Data->RoomsCoordinate.Init({0,0,0}, Data->PathLength);
+	Data->RoomsGridIndex.Init(-1, Data->PathLength);
+	for (int32 Index = 0; Index < Data->PathLength; Index++)
+	{
+		FRoomInfo RoomInfo = Info.RoomsInfo[Index];
+		Data->RoomsPresetID[Index] = RoomInfo.PresetID;
+		Data->RoomsPresetPaths[Index] = RoomInfo.PresetPath;
+		Data->RoomsCoordinate[Index] = RoomInfo.CoordinateInGrid;
+		Data->RoomsGridIndex[Index] = RoomInfo.IndexInGrid;
+		const int32 RoomsCount = RoomInfo.DoorsInfo.Num();
+		for (int32 DoorIndex = 0; DoorIndex < RoomsCount; DoorIndex++)
+		{
+			const int32 IntDirection = static_cast<int32>
+				(RoomInfo.DoorsInfo[DoorIndex].Direction);
+			Data->DoorsDirection.Add(IntDirection);
+			Data->DoorsSourceRoomIndex.Add(RoomInfo.DoorsInfo[DoorIndex].SourceRoomIndex);
+			Data->DoorsNextRoomIndex.Add(RoomInfo.DoorsInfo[DoorIndex].NextRoomIndex);
+		}		
+	}
+	// ----------------
+	 
+	CurrentDungeonFile = Data;
+	CurrentDungeonPath = *Data->GetPathName();
+	DungeonPackage = Package;
+	
+	const FString Filename = FPackageName::LongPackageNameToFilename(
+    Package->GetName(), FPackageName::GetAssetPackageExtension());
+    UPackage::SavePackage(Package, Data, RF_Public | RF_Standalone, *Filename);
+	FAssetRegistryModule::AssetCreated(Data);
+
+	Package->MarkPackageDirty();
+	
+	return Data;
+}
+
+UDungeonData* FDungeonUtils::GetDungeonDataAsset()
+{
+	const FAssetData AssetData = FAssetRegistryModule::GetRegistry()
+		.GetAssetByObjectPath(CurrentDungeonPath);
+	if (UDungeonData* Data = Cast<UDungeonData>(AssetData.GetAsset()))
+	{
+		return Data;
+	}
+	return nullptr;
 }

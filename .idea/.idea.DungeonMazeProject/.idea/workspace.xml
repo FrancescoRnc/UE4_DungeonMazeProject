@@ -9,26 +9,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0e29f12b-c1c1-4695-8913-83f5bc717cf6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Private/DungeonData.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Private/DungeonRoom.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Private/DungeonSchemeMaker.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Private/DungeonUtilities.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Public/DungeonData.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Public/DungeonRoom.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Public/DungeonSchemeMaker.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Public/DungeonUtilities.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Private/Door.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Public/Door.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DungeonMazeProject/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DungeonMazeProject/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Config/DefaultEngine.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultEngine.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Game_Levels/Main_Persistent.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Game_Levels/Main_Persistent.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Actors/BP_DungeonDoor.uasset" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/Game_Levels/RoomGen.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Game_Levels/RoomGen.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Game_Levels/Sample_Room_Level.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Game_Levels/Sample_Room_Level.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/Prefabrics/Room01_Pkg.uasset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/DungeonGenerator.Build.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/DungeonGenerator.Build.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Game_Levels/TestLevel.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Game_Levels/TestLevel.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Private/DungeonData.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Private/DungeonData.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Private/DungeonGenerator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Private/DungeonGenerator.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Private/DungeonRoom.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Private/DungeonRoom.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Private/DungeonSchemeMaker.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Private/DungeonSchemeMaker.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Private/DungeonUtilities.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Private/DungeonUtilities.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Private/RoomData.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Private/RoomData.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Public/DungeonData.h" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Public/DungeonData.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Public/DungeonGenerator.h" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Public/DungeonGenerator.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Public/DungeonRoom.h" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Public/DungeonRoom.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Public/DungeonUtilities.h" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Public/DungeonUtilities.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Public/RoomData.h" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Public/RoomData.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Public/SRoomSelectorCombo.h" beforeDir="false" afterPath="$PROJECT_DIR$/Plugins/DungeonGenerator/Source/DungeonGenerator/Public/SRoomSelectorCombo.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -328,6 +325,11 @@
       <workItem from="1638717517394" duration="1002000" />
       <workItem from="1638781942445" duration="24261000" />
       <workItem from="1638861869971" duration="7061000" />
+      <workItem from="1638900249922" duration="11345000" />
+      <workItem from="1638967699258" duration="32000" />
+      <workItem from="1638970998491" duration="6334000" />
+      <workItem from="1639040424608" duration="12814000" />
+      <workItem from="1639130417359" duration="8928000" />
     </task>
     <servers />
   </component>

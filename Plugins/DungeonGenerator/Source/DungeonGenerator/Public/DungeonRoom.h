@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 //#include "DungeonUtilities.h"
 #include "RoomData.h"
+#include "Door.h"
 #include "DungeonRoom.generated.h"
 
 
@@ -26,6 +27,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	UStaticMeshComponent* WallsMeshComponent;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	TArray<ADoor*> DoorsRef;
 	
 	FRoomInfo RoomInfo;
 	
@@ -39,14 +43,14 @@ public:
 	//virtual void Tick(float DeltaTime) override;
 
 
-	UFUNCTION(BlueprintCallable)
-	void Locate();
-
-	UFUNCTION(BlueprintCallable)
-	void Show();
-	
-	UFUNCTION(BlueprintCallable)
-	void Generate(const TSoftObjectPtr<URoomPreset> Preset);
-	
-	void InsertData(const FRoomInfo& Info);	
+	//UFUNCTION(BlueprintCallable)
+	//void Locate();
+	//
+	//UFUNCTION(BlueprintCallable)
+	//void Show();
+	//
+	//UFUNCTION(BlueprintCallable)
+	//void Generate(const TSoftObjectPtr<URoomPreset> Preset);
+	//
+	//void InsertData(const FRoomInfo& Info);
 };

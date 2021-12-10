@@ -8,25 +8,26 @@
 #include "Modules/ModuleManager.h"
 
 
-
-
-
 /**
-* FRoomGenerator Class
+* FRoomGenerator - This class makes a new ADungeonRoom Instance,
+* with 
+* 
 */
 class FRoomGenerator
 {
 public:
 	FRoomGenerator();
-
-	FReply DGCommandRoomPreview();
 	
 	class ADungeonRoom* Generate(const FRoomInfo& Info);
+	void InsertData(ADungeonRoom* Room, const FRoomInfo& Info);	
+	void Locate(ADungeonRoom* Room);
+	void Show(ADungeonRoom* Room);	
 };
 
 
 /**
 * FDungeonGenerator CLass
+* 
 */
 class FDungeonGenerator : public IDungeonBuilder
 {
@@ -36,8 +37,8 @@ public:
 
 	/** IDungeonBuilder implementation */
 	virtual void BuildDungeon() override;
-	virtual void BuildRooms(TArray<FRoomInfo>& OutRoomsInfo) override;
-	virtual void BuildDoors(TArray<FDoorInfo>& OutDoorsInfo) override;
+	virtual void BuildRooms() override;
+	virtual void BuildDoors() override;
 	
 	FORCEINLINE const FDungeonInfo& GetDungeonInfo() const
 	{
@@ -72,13 +73,17 @@ private:
     const int32 HPadding = 10;
     const int32 VPadding = 10;
 	
-	TSharedPtr<FDungeonGenerator> DungeonGenerator;
-	TSharedPtr<FRoomGenerator> RoomGenerator;
+	//TSharedPtr<FDungeonGenerator> DungeonGenerator;
+	//TSharedPtr<FRoomGenerator> RoomGenerator;
 	TSharedPtr<FDungeonUtils> DungeonUtils;
 	
 	FDungeonInfo CurrentDungeonInfo;
+	UDungeonData* CurrentDungeonData = nullptr;
 	TArray<FRoomInfo> RoomsInfo;
 	TArray<FDoorInfo> DoorsInfo;
+
+	TArray<ADungeonRoom*> RoomsRef;
+	TArray<class ADoor*> DoorsRef;
 	
 	
 	FReply DGCommandGenerate();

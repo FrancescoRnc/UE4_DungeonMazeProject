@@ -3,32 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Door.h"
 #include "UObject/NoExportTypes.h"
 #include "RoomData.generated.h"
 
 
-/**
-* 
-*/
-enum class EWorldDirection : uint8
-{
-	NORTH = 1,
-	EAST = 2,
-	SOUTH = 4,
-	WEST = 8
-};
 
-/**
-* 
-*/
-struct FDoorInfo
-{
-	FName SourceRoomName;
-	FName NextRoomName;	
-	int32 SourceRoomIndex;
-	int32 NextRoomIndex;
-	EWorldDirection Direction;
-};
 
 /**
 * 
